@@ -32,9 +32,9 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {
 
-    this.showEdit = this.showEdit !== undefined;
-    this.showBack = this.showBack !== undefined;
-    this.showAdd = this.showAdd !== undefined;
+    this.showEdit = typeof this.showEdit === 'boolean' ? this.showEdit : this.showEdit !== undefined;
+    this.showBack = typeof this.showBack === 'boolean' ? this.showBack : this.showBack !== undefined;
+    this.showAdd = typeof this.showAdd === 'boolean' ? this.showAdd : this.showAdd !== undefined;
 
   }
 

@@ -12,16 +12,6 @@ span.error fa-icon {
   margin: 0 5px;
 }
 
-.spinner-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  fa-icon {
-    color: map-get($colors, gray-medium);
-    animation: spin .6s steps(8) infinite;
-  }
-}
-
 .auth-container {
   height: 100%;
   display: flex;

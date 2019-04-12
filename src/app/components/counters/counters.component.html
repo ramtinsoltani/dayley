@@ -1,6 +1,17 @@
-<ng-template [ngIf]="state === countersState.ListView">
-  <app-header title="Counters" show-add></app-header>
-  <div class="content-container">
-    <p>Counters works!</p>
+<app-header
+title="Counters"
+[show-back]="state !== countersState.ListView && state !== countersState.Loading"
+[show-add]="state === countersState.ListView" (onadd)="showNewView()">
+</app-header>
+<div *ngIf="state === countersState.ListView" class="content-container">
+  <div class="list">
+    <div *ngFor="let counter of counters; let index = index" class="list-item">
+      <fa-icon [icon]="counter.icon" size="lg" transform="shrink-3"></fa-icon>
+      <span class="label">{{ counter.name }}</span>
+      <span class="meta">{{ counter.resets }}</span>
+    </div>
   </div>
-</ng-template>
+</div>
+<div *ngIf="state === countersState.Loading" class="h-100 spinner-container">
+  <fa-icon icon="spinner" size="2x"></fa-icon>
+</div>

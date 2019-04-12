@@ -114,6 +114,16 @@ button {
   overflow: auto;
 }
 
+.spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  fa-icon {
+    color: map-get($colors, gray-medium);
+    animation: spin .6s steps(8) infinite;
+  }
+}
+
 .list {
   display: flex;
   flex-direction: column;
@@ -137,6 +147,7 @@ button {
     span.meta {
       color: map-get($colors, gray-medium);
       margin-left: 10px;
+      text-transform: capitalize;
     }
     &:active {
       background-color: map-get($colors, gray-light);
