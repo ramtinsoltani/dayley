@@ -41,7 +41,16 @@ export class AppService {
       this.mustFetchStats = true;
 
     });
+const int = setInterval(() => {
 
+  for ( const counter of this.counters ) {
+    if ( counter.id === null ) {
+      console.log(counter.name, 'has null id!');
+clearInterval(int)
+    }
+  }
+
+}, 10);
   }
 
   public getTodos(): Promise<Todo[]> {
@@ -209,7 +218,7 @@ export class AppService {
 
     return new Promise((resolve, reject) => {
 
-      this.firebase.updateTodo(todo)
+      this.firebase.updateTodo(_.merge(todo, { lastUpdate: Date.now() }))
       .then(() => {
 
         this.todos[index] = _.cloneDeep(todo);
@@ -222,17 +231,27 @@ export class AppService {
 
   }
 
-  public updateCounter(index: number, counter: Counter): Promise<void> {
+  public updateCounter(index: number, name: string, limit: number, resets: LimitReset, icon: string): Promise<number> {
 
     if ( index < 0 || index > this.counters.length - 1 ) return Promise.reject(new Error('Index out of range!'));
 
     return new Promise((resolve, reject) => {
 
-      this.firebase.updateCounter(counter)
+      const newCounter: Counter = _.merge(this.counters[index], {
+        name: name,
+        limit: limit,
+        resets: resets,
+        icon: icon,
+        lastUpdate: Date.now()
+      });
+
+      this.firebase.updateCounter(newCounter)
       .then(() => {
 
-        this.counters[index] = _.cloneDeep(counter);
-        resolve();
+        this.counters[index] = _.cloneDeep(newCounter);
+        this.counters = _.orderBy(this.counters, ['lastUpdate'], ['desc']);
+
+        resolve(_.findIndex(this.counters, { id: newCounter.id }));
 
       })
       .catch(reject);

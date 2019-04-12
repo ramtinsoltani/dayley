@@ -141,7 +141,7 @@ export class FirebaseService {
 
     if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
 
-    return firebase.database().ref(`counters/${firebase.auth().currentUser.uid}/${counter.id}`).update(_.merge(counter, { id: null }));
+    return firebase.database().ref(`counters/${firebase.auth().currentUser.uid}/${counter.id}`).update(_.merge(_.cloneDeep(counter), { id: null }));
 
   }
 
@@ -176,7 +176,7 @@ export class FirebaseService {
 
     if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
 
-    return firebase.database().ref(`todos/${firebase.auth().currentUser.uid}/${todo.id}`).update(_.merge(todo, { id: null }));
+    return firebase.database().ref(`todos/${firebase.auth().currentUser.uid}/${todo.id}`).update(_.merge(_.cloneDeep(todo), { id: null }));
 
   }
 

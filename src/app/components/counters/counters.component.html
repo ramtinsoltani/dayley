@@ -1,17 +1,65 @@
 <app-header
-title="Counters"
+[title]="title"
 [show-back]="state !== countersState.ListView && state !== countersState.Loading"
-[show-add]="state === countersState.ListView" (onadd)="showNewView()">
+[show-add]="state === countersState.ListView"
+[show-edit]="state === countersState.DetailView"
+(onback)="showListView()"
+(onadd)="showNewView()"
+(onedit)="showEditView()">
 </app-header>
-<div *ngIf="state === countersState.ListView" class="content-container">
+<div *ngIf="state === countersState.ListView" class="content-container ph-0">
   <div class="list">
-    <div *ngFor="let counter of counters; let index = index" class="list-item">
+    <div *ngFor="let counter of counters; let index = index" class="list-item" (click)="showDetailView(index)">
       <fa-icon [icon]="counter.icon" size="lg" transform="shrink-3"></fa-icon>
       <span class="label">{{ counter.name }}</span>
       <span class="meta">{{ counter.resets }}</span>
     </div>
   </div>
 </div>
+<div *ngIf="state === countersState.NewView || state === countersState.EditView" class="content-container">
+  <form #ef="ngForm" (ngSubmit)="updateCounter(ef)" class="between">
+    <div class="input-group">
+      <input name="name" type="text" placeholder="Name" required [ngModel]="state === countersState.EditView ? counters[currentCounter].name : ''">
+      <input name="limit" type="number" placeholder="Limit" required [ngModel]="state === countersState.EditView ? counters[currentCounter].limit : ''">
+      <div class="inline-input-group">
+        <span class="label">Resets</span>
+        <select name="resets" class="fill" [ngModel]="state === countersState.EditView ? counters[currentCounter].resets : resetsDefault.value">
+          <option #resetsDefault value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="manual">Manual</option>
+        </select>
+      </div>
+      <div class="inline-input-group">
+        <span class="label">Icon</span>
+        <input type="text" name="icon" [ngModel]="state === countersState.EditView ? counters[currentCounter].icon : 'calculator'" hidden>
+        <div class="fill icon-view">
+          <fa-icon [icon]="ef.value.icon || 'calculator'" size="lg"></fa-icon>
+        </div>
+        <button class="small" type="button" (click)="openIconSelector()">SELECT</button>
+      </div>
+    </div>
+    <div *ngIf="state === countersState.NewView" class="input-group">
+      <button type="submit" class="primary">CREATE</button>
+    </div>
+    <div *ngIf="state === countersState.EditView" class="input-group">
+      <button type="submit">SAVE</button>
+      <button type="button" class="primary" (click)="deleteCounter()">DELETE</button>
+    </div>
+  </form>
+</div>
 <div *ngIf="state === countersState.Loading" class="h-100 spinner-container">
   <fa-icon icon="spinner" size="2x"></fa-icon>
+</div>
+<div *ngIf="iconSelection" class="modal-container">
+  <div class="modal">
+    <div class="search-bar">
+      <input type="text" placeholder="Search for icons..." (input)="filterIcons($event.target.value)">
+    </div>
+    <div class="icons-container">
+      <div *ngFor="let icon of icons; let index = index" class="icon-item" (click)="selectIcon(index)">
+        <fa-icon [icon]="icon" size="2x"></fa-icon>
+      </div>
+    </div>
+  </div>
 </div>

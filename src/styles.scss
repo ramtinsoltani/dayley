@@ -8,6 +8,7 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  user-select: none;
 }
 
 a {
@@ -30,14 +31,40 @@ form {
     display: flex;
     flex-direction: column;
     & > *:not(:last-child) {
+      margin-bottom: 20px;
+    }
+    &:not(:last-child) {
+      margin-bottom: 20px;
+    }
+    & > button:not(:last-child) {
       margin-bottom: 10px;
+    }
+  }
+  .inline-input-group {
+    display: flex;
+    align-items: center;
+    & > *:not(:last-child) {
+      margin-right: 15px;
+    }
+    .fill {
+      flex-grow: 1;
+    }
+    .icon-view {
+      height: 35px;
+      display: flex;
+      align-items: center;
+    }
+    span.label {
+      min-width: 50px;
     }
   }
 }
 
 input[type="text"],
+input[type="number"],
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+select {
   height: 35px;
   background-color: map-get($colors, gray-lightest);
   border: none;
@@ -88,6 +115,10 @@ button {
   font-size: 16px;
   padding: 0 15px;
   transition: color .2s ease-in-out, background-color .2s ease-in-out;
+  &.small {
+    height: 35px;
+    font-size: 14px;
+  }
   &:disabled {
     background-color: map-get($colors, gray-dark);
     color: map-get($colors, gray-light);
@@ -151,6 +182,57 @@ button {
     }
     &:active {
       background-color: map-get($colors, gray-light);
+    }
+  }
+}
+
+.modal-container {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background-color: map-get($colors, shadow-dark);
+  display: flex;
+  padding: 20px;
+  box-sizing: border-box;
+  .modal {
+    box-shadow: 0 0 10px map-get($colors, shadow);
+    border-radius: 3px;
+    background-color: map-get($colors, gray-lightest);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    .search-bar {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+    .icons-container {
+      display: flex;
+      flex-grow: 1;
+      justify-content: flex-start;
+      align-content: flex-start;
+      overflow: auto;
+      flex-wrap: wrap;
+      .icon-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 25%;
+        max-width: 80px;
+        min-width: 60px;
+        height: 60px;
+        border-radius: 3px;
+        background-color: map-get($colors, gray-lightest);
+        color: map-get($colors, gray-darker);
+        transition: background-color .2s ease-in-out, color .2s ease-in-out;
+        &:active {
+          background-color: map-get($colors, gray-light);
+          color: map-get($colors, accent);
+        }
+      }
     }
   }
 }
