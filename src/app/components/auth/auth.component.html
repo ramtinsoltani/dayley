@@ -1,0 +1,66 @@
+<div *ngIf="state === authState.Login" class="auth-container">
+  <h1>Login</h1>
+  <form #lf="ngForm" (ngSubmit)="login(lf)" class="between">
+    <div class="input-group">
+      <span *ngIf="errorMessage" class="error">
+        <fa-icon icon="exclamation"></fa-icon>
+        {{ errorMessage }}
+      </span>
+      <input type="email" name="email" placeholder="Email" ngModel required validateEmail>
+      <input type="password" name="password" placeholder="Password" ngModel required minlength="6">
+      <span class="small center mt-1 link" (click)="switchState(authState.PasswordReset)">I can't access my account...</span>
+    </div>
+    <div class="input-group">
+      <button [disabled]="lf.invalid" type="submit" class="block primary">LOGIN</button>
+      <button type="button" class="block" (click)="switchState(authState.Signup)">SIGNUP</button>
+    </div>
+  </form>
+</div>
+<div *ngIf="state === authState.Signup" class="auth-container">
+  <h1>Signup</h1>
+  <form #sf="ngForm" (ngSubmit)="signup(sf)" class="between">
+    <div class="input-group">
+      <span *ngIf="errorMessage" class="error">
+        <fa-icon icon="exclamation"></fa-icon>
+        {{ errorMessage }}
+      </span>
+      <input type="email" name="email" placeholder="Email" ngModel required validateEmail>
+      <input type="password" name="password" placeholder="Password" ngModel required minlength="6">
+      <input type="password" name="confirmPassword" placeholder="Confirm Password" ngModel required confirmPassword>
+    </div>
+    <div class="input-group">
+      <button [disabled]="sf.invalid" type="submit" class="block primary">SIGNUP</button>
+      <button type="button" class="block" (click)="switchState(authState.Login)">LOGIN</button>
+    </div>
+  </form>
+</div>
+<div *ngIf="state === authState.PasswordReset" class="auth-container">
+  <h1>Account Recovery</h1>
+  <form #rf="ngForm" (ngSubmit)="recover(rf)" class="between">
+    <div class="input-group">
+      <span *ngIf="errorMessage" class="error">
+        <fa-icon icon="exclamation"></fa-icon>
+        {{ errorMessage }}
+      </span>
+      <input type="email" name="email" placeholder="Email" ngModel required validateEmail>
+    </div>
+    <div class="input-group">
+      <button [disabled]="rf.invalid" type="submit" class="block primary">RECOVER</button>
+      <button type="button" class="block" (click)="switchState(authState.Login)">LOGIN</button>
+    </div>
+  </form>
+</div>
+<div *ngIf="state === authState.EmailSent" class="auth-container">
+  <h1>Account Recovery</h1>
+  <form class="between">
+    <div class="input-group">
+      <p>We have sent you an email with instructions to reset your password.</p>
+    </div>
+    <div class="input-group">
+      <button type="button" class="block" (click)="switchState(authState.Login)">LOGIN</button>
+    </div>
+  </form>
+</div>
+<div *ngIf="state === authState.Loading" class="h-100 spinner-container">
+  <fa-icon icon="spinner" size="2x"></fa-icon>
+</div>

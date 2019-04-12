@@ -23,7 +23,9 @@
     "paths": {
       "@app/services": ["src/app/services"],
       "@app/model/*": ["src/app/models/*.model.ts"],
-      "@app/components": ["src/app/components"]
+      "@app/components": ["src/app/components"],
+      "@app/config/*": ["src/app/configs/*.json"],
+      "@app/directive/*": ["src/app/directives/*.directive.ts"]
     }
   }
 }

@@ -1,0 +1,36 @@
+@import '../../../colors';
+
+:host {
+  display: flex;
+  height: 64px;
+  background-color: map-get($colors, accent);
+  padding: 20px 30px;
+  box-sizing: border-box;
+  box-shadow: 0 0 10px map-get($colors, shadow);
+  color: map-get($colors, gray-lightest);
+  text-transform: uppercase;
+  font-size: 20px;
+}
+
+.title {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  flex-grow: 1;
+}
+
+.icon-button {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:first-child {
+    margin-right: 20px;
+    margin-left: -10px
+  }
+  &:last-child {
+    margin-left: 20px;
+    margin-right: -10px;
+  }
+}

@@ -1,0 +1,10 @@
+<div *ngIf="showBack" class="icon-button" (click)="onBack.emit()">
+  <fa-icon icon="chevron-left" size="lg"></fa-icon>
+</div>
+<span class="title">{{ title }}</span>
+<div *ngIf="showEdit" class="icon-button" (click)="onEdit.emit()">
+  <fa-icon icon="pen"></fa-icon>
+</div>
+<div *ngIf="showAdd" class="icon-button" (click)="onAdd.emit()">
+  <fa-icon class="add-icon" icon="plus" size="lg" transform="shrink-1.5"></fa-icon>
+</div>

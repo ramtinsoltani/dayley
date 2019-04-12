@@ -1,0 +1,22 @@
+@import '../../../colors';
+
+:host {
+  display: flex;
+  height: 60px;
+  background-color: map-get($colors, gray-lighter);
+  border-top: 1px solid map-get($colors, gray-light);
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  color: map-get($colors, gray-medium);
+  transition: color .2s ease-in-out;
+  outline: none;
+  &.active { color: map-get($colors, accent); }
+}
