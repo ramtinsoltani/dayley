@@ -10,7 +10,7 @@
 <div *ngIf="state === countersState.ListView" class="content-container ph-0">
   <div class="list">
     <div *ngFor="let counter of counters; let index = index" class="list-item" (click)="showDetailView(index)">
-      <fa-icon [icon]="counter.icon" size="lg" transform="shrink-3"></fa-icon>
+      <fa-icon [icon]="counter.icon" size="lg" transform="shrink-3" [ngClass]="{ over: counter.value > counter.limit && counter.limit }"></fa-icon>
       <span class="label">{{ counter.name }}</span>
       <span class="meta">{{ counter.resets }}</span>
     </div>
@@ -20,7 +20,7 @@
   <form #ef="ngForm" (ngSubmit)="updateCounter(ef)" class="between">
     <div class="input-group">
       <input name="name" type="text" placeholder="Name" required [ngModel]="state === countersState.EditView ? counters[currentCounter].name : ''">
-      <input name="limit" type="number" placeholder="Limit" required [ngModel]="state === countersState.EditView ? counters[currentCounter].limit : ''">
+      <input name="limit" type="number" placeholder="Limit (0 for no limit)" pattern="^\d+$" required [ngModel]="state === countersState.EditView ? counters[currentCounter].limit : ''">
       <div class="inline-input-group">
         <span class="label">Resets</span>
         <select name="resets" class="fill" [ngModel]="state === countersState.EditView ? counters[currentCounter].resets : resetsDefault.value">
@@ -40,13 +40,28 @@
       </div>
     </div>
     <div *ngIf="state === countersState.NewView" class="input-group">
-      <button type="submit" class="primary">CREATE</button>
+      <button [disabled]="ef.invalid" type="submit" class="primary">CREATE</button>
     </div>
     <div *ngIf="state === countersState.EditView" class="input-group">
-      <button type="submit">SAVE</button>
+      <button [disabled]="ef.invalid" type="submit">SAVE</button>
       <button type="button" class="primary" (click)="deleteCounter()">DELETE</button>
     </div>
   </form>
+</div>
+<div *ngIf="state === countersState.DetailView" class="content-container">
+  <div class="counter-details">
+    <fa-icon [icon]="counters[currentCounter].icon" size="5x" [ngClass]="{ over: counters[currentCounter].value > counters[currentCounter].limit && counters[currentCounter].limit }"></fa-icon>
+    <span class="counter" [ngClass]="{ over: counters[currentCounter].value > counters[currentCounter].limit && counters[currentCounter].limit }">{{ counters[currentCounter].value }}
+      <span *ngIf="counters[currentCounter].limit" class="counter-limit">/{{ counters[currentCounter].limit }}</span>
+    </span>
+    <span *ngIf="counters[currentCounter].limit && counters[currentCounter].value <= counters[currentCounter].limit" class="info">You have {{ counters[currentCounter].limit - counters[currentCounter].value }}{{ counters[currentCounter].resets !== 'manual' ? ' ' + counters[currentCounter].resets : '' }} {{ counters[currentCounter].name }} left{{ getUntilText() }}</span>
+    <span *ngIf="counters[currentCounter].limit && counters[currentCounter].value > counters[currentCounter].limit" class="info over">You have exceeded the allowed{{ counters[currentCounter].resets !== 'manual' ? ' ' + counters[currentCounter].resets : '' }} {{ counters[currentCounter].name }}!</span>
+  </div>
+  <div class="counter-buttons">
+    <button (click)="incrementCurrentCounter()" type="button" class="value-btn primary"><fa-icon icon="plus" size="lg"></fa-icon></button>
+    <button (click)="decrementCurrentCounter()" [disabled]="! counters[currentCounter].value" type="button" class="value-btn"><fa-icon icon="minus" size="lg"></fa-icon></button>
+    <button *ngIf="counters[currentCounter].resets === 'manual'" (click)="resetLimitOnCurrentCounter()" type="button" class="wide">RESET</button>
+  </div>
 </div>
 <div *ngIf="state === countersState.Loading" class="h-100 spinner-container">
   <fa-icon icon="spinner" size="2x"></fa-icon>

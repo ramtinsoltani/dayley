@@ -1,7 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AppService } from '@app/services';
 import { Counter } from '@app/model/counter';
+import { LimitReset } from '@app/model/common';
+import { Subscription } from 'rxjs';
 import _ from 'lodash';
 import iconsList from '@app/config/icons';
 
@@ -10,7 +12,7 @@ import iconsList from '@app/config/icons';
   templateUrl: './counters.component.html',
   styleUrls: ['./counters.component.scss']
 })
-export class CountersComponent implements OnInit {
+export class CountersComponent implements OnInit, OnDestroy {
 
   @ViewChild('ef')
   public editForm: NgForm;
@@ -22,6 +24,8 @@ export class CountersComponent implements OnInit {
   public title: string = 'counters';
   public iconSelection: boolean = false;
   public icons: string[] = iconsList;
+
+  private sub: Subscription;
 
   constructor(
     private app: AppService
@@ -43,6 +47,33 @@ export class CountersComponent implements OnInit {
       this.state = CountersState.ListView;
 
     });
+
+    this.sub = this.app.onCounterReset.subscribe(() => {
+
+      this.app.getCounters()
+      .then(counters => {
+
+        let currentId = this.counters[this.currentCounter].id;
+
+        this.counters = counters;
+
+        if ( this.currentCounter > -1 ) return this.app.getCounterIndex(currentId);
+
+      })
+      .then(index => {
+
+        if ( index !== undefined ) this.currentCounter = index;
+
+      })
+      .catch(console.error);
+
+    });
+
+  }
+
+  ngOnDestroy() {
+
+    if ( this.sub && ! this.sub.closed ) this.sub.unsubscribe();
 
   }
 
@@ -80,13 +111,17 @@ export class CountersComponent implements OnInit {
 
     if ( this.state === CountersState.NewView ) {
 
+      let newIndex: number;
+
       this.app.newCounter(
         form.value.name.trim(),
         form.value.limit * 1,
         form.value.resets,
         form.value.icon
       )
-      .then(() => {
+      .then(index => {
+
+        newIndex = index;
 
         return this.app.getCounters();
 
@@ -94,7 +129,8 @@ export class CountersComponent implements OnInit {
       .then(counters => {
 
         this.counters = counters;
-        this.showDetailView(this.counters.length - 1);
+        this.currentCounter = newIndex;
+        this.showDetailView(this.currentCounter);
 
       })
       .catch(console.error);
@@ -172,6 +208,124 @@ export class CountersComponent implements OnInit {
       return (new RegExp(query.toLowerCase().trim(), 'ig')).test(name);
 
     });
+
+  }
+
+  public incrementCurrentCounter(): void {
+
+    let newIndex: number;
+
+    this.app.updateCounterValue(this.currentCounter, this.counters[this.currentCounter].value + 1)
+    .then(index => {
+
+      newIndex = index;
+
+      return this.app.getCounters();
+
+    })
+    .then(counters => {
+
+      this.counters = counters;
+      this.currentCounter = newIndex;
+
+    })
+    .catch(console.error);
+
+  }
+
+  public decrementCurrentCounter(): void {
+
+    if ( ! this.counters[this.currentCounter].value ) return;
+
+    let newIndex: number;
+
+    this.app.updateCounterValue(this.currentCounter, this.counters[this.currentCounter].value - 1)
+    .then(index => {
+
+      newIndex = index;
+
+      return this.app.getCounters();
+
+    })
+    .then(counters => {
+
+      this.counters = counters;
+      this.currentCounter = newIndex;
+
+    })
+    .catch(console.error);
+
+  }
+
+  public resetLimitOnCurrentCounter(): void {
+
+    let newIndex: number;
+
+    this.app.resetCounter(this.counters[this.currentCounter].id)
+    .then(index => {
+
+      newIndex = index;
+
+      return this.app.getCounters();
+
+    })
+    .then(counters => {
+
+      this.counters = counters;
+      this.currentCounter = newIndex;
+
+    })
+    .catch(console.error);
+
+  }
+
+  public getUntilText(): string {
+
+    const counter = this.counters[this.currentCounter];
+    const date = new Date();
+
+    if ( counter.resets === LimitReset.Manual ) return '';
+    else if ( counter.resets === LimitReset.Daily ) {
+
+      const nextDay = new Date(date.getTime() + 86400000);
+
+      return ` until ${nextDay.getMonth() + 1 < 10 ? '0' : ''}${nextDay.getMonth() + 1}/${nextDay.getDate() < 10 ? '0' : ''}${nextDay.getDate()}/${nextDay.getFullYear()}`;
+
+    }
+    else if ( counter.resets === LimitReset.Weekly ) {
+
+      let day = date.getDay();
+      let daysUntilNextWeek: number;
+
+      // Sunday
+      if ( day === 0 ) daysUntilNextWeek = 1;
+      // Monday
+      else if ( day === 1 ) daysUntilNextWeek = 7;
+      // Tuesday - Saturday
+      else daysUntilNextWeek = 8 - day;
+
+      const nextMonday = new Date((daysUntilNextWeek * 86400000) + date.getTime());
+
+      return ` until ${nextMonday.getMonth() + 1 < 10 ? '0' : ''}${nextMonday.getMonth() + 1}/${nextMonday.getDate() < 10 ? '0' : ''}${nextMonday.getDate()}/${nextMonday.getFullYear()}`;
+
+    }
+    else if ( counter.resets === LimitReset.Monthly ) {
+
+      let year = date.getFullYear();
+      let month: any = date.getMonth() + 2;
+
+      if ( month > 12 ) {
+
+        month = 0;
+        year++;
+
+      }
+
+      if ( month < 10 ) month = '0' + month;
+
+      return ` until ${month}/01/${year}`;
+
+    }
 
   }
 

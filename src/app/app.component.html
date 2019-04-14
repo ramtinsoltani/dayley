@@ -2,6 +2,10 @@
   <router-outlet></router-outlet>
   <app-footer *ngIf="authenticated"></app-footer>
 </div>
-<div *ngIf="! authenticated && noAuth" class="loading-container">
+<div *ngIf="! authenticated && noAuth && ! desktop" class="loading-container">
   <fa-icon icon="spinner" size="2x"></fa-icon>
+</div>
+<div *ngIf="desktop" class="error-container">
+  <fa-icon icon="mobile-alt" size="10x"></fa-icon>
+  <p>We're sorry but this app is designed for mobile only!</p>
 </div>

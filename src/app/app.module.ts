@@ -1,9 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DeviceDetectorModule } from 'ngx-device-detector';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
+  faMinus,
   faTasks,
   faSpinner,
   faExclamation,
@@ -211,6 +213,7 @@ import {
 } from '@app/components';
 
 library.add(
+  faMinus,
   faTasks,
   faSpinner,
   faExclamation,
@@ -420,6 +423,7 @@ library.add(
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    DeviceDetectorModule.forRoot(),
     FontAwesomeModule
   ],
   providers: [],

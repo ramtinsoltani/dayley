@@ -18,3 +18,20 @@
     animation: spin .6s steps(8) infinite;
   }
 }
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 30px;
+  width: 100%;
+  height: 100%;
+  fa-icon { color: map-get($colors, accent); }
+  p {
+    font-size: 32px;
+    max-width: 500px;
+    text-align: center;
+  }
+}

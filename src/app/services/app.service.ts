@@ -3,6 +3,8 @@ import { FirebaseService } from './firebase.service';
 import { Counter } from '@app/model/counter';
 import { Todo } from '@app/model/todo';
 import { LimitReset } from '@app/model/common';
+import { Subject } from 'rxjs';
+import moment from 'moment';
 import _ from 'lodash';
 
 @Injectable({
@@ -16,6 +18,8 @@ export class AppService {
   private mustFetchCounters: boolean = true;
   private mustFetchTodos: boolean = true;
   private mustFetchStats: boolean = true;
+
+  public onCounterReset: Subject<void> = new Subject<void>();
 
   constructor(
     private firebase: FirebaseService
@@ -41,16 +45,35 @@ export class AppService {
       this.mustFetchStats = true;
 
     });
-const int = setInterval(() => {
 
-  for ( const counter of this.counters ) {
-    if ( counter.id === null ) {
-      console.log(counter.name, 'has null id!');
-clearInterval(int)
-    }
-  }
+    // Check counters for reset
+    setInterval(() => {
 
-}, 10);
+      for ( const counter of this.counters ) {
+
+        if ( counter.resets === LimitReset.Manual ) continue;
+
+        const lastReset = moment(counter.lastReset);
+        const now = moment();
+
+        if ( (counter.resets === LimitReset.Daily && now.diff(lastReset, 'days') > 0) ||
+        (counter.resets === LimitReset.Monthly && now.diff(lastReset, 'months') > 0) ||
+        (counter.resets === LimitReset.Weekly && now.diff(lastReset, 'weeks')) ) {
+
+          this.resetCounter(counter.id)
+          .then(() => {
+
+            this.onCounterReset.next();
+
+          })
+          .catch(console.error);
+
+        }
+
+      }
+
+    }, 1000);
+
   }
 
   public getTodos(): Promise<Todo[]> {
@@ -114,7 +137,7 @@ clearInterval(int)
     name: string,
     resets: LimitReset,
     icon: string,
-  ): Promise<void> {
+  ): Promise<number> {
 
     return new Promise((resolve, reject) => {
 
@@ -132,7 +155,7 @@ clearInterval(int)
         this.todos.push(todo);
         this.todos = _.orderBy(this.todos, ['lastUpdate'], ['desc']);
 
-        resolve();
+        resolve(this.getTodoIndex(todo.id));
 
       })
       .catch(reject);
@@ -146,7 +169,7 @@ clearInterval(int)
     limit: number,
     resets: LimitReset,
     icon: string
-  ): Promise<void> {
+  ): Promise<number> {
 
     return new Promise((resolve, reject) => {
 
@@ -165,7 +188,7 @@ clearInterval(int)
         this.counters.push(counter);
         this.counters = _.orderBy(this.counters, ['lastUpdate'], ['desc']);
 
-        resolve();
+        resolve(this.getCounterIndex(counter.id));
 
       })
       .catch(reject);
@@ -212,17 +235,24 @@ clearInterval(int)
 
   }
 
-  public updateTodo(index: number, todo: Todo): Promise<void> {
+  public updateTodo(index: number, name: string, ): Promise<number> {
 
     if ( index < 0 || index > this.todos.length - 1 ) return Promise.reject(new Error('Index out of range!'));
 
     return new Promise((resolve, reject) => {
 
-      this.firebase.updateTodo(_.merge(todo, { lastUpdate: Date.now() }))
+      const newTodo: Todo = _.merge(this.todos[index], {
+        lastUpdate: Date.now(),
+        // TODO: overwrite todo object with new input
+      });
+
+      this.firebase.updateTodo(newTodo)
       .then(() => {
 
-        this.todos[index] = _.cloneDeep(todo);
-        resolve();
+        this.todos[index] = _.cloneDeep(newTodo);
+        this.todos = _.orderBy(this.todos, ['lastUpdated'], ['desc']);
+
+        resolve(this.getTodoIndex(newTodo.id));
 
       })
       .catch(reject);
@@ -251,7 +281,65 @@ clearInterval(int)
         this.counters[index] = _.cloneDeep(newCounter);
         this.counters = _.orderBy(this.counters, ['lastUpdate'], ['desc']);
 
-        resolve(_.findIndex(this.counters, { id: newCounter.id }));
+        resolve(this.getCounterIndex(newCounter.id));
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
+  public updateCounterValue(index: number, value: number): Promise<number> {
+
+    if ( index < 0 || index > this.counters.length - 1 ) return Promise.reject(new Error('Index out of range!'));
+
+    return new Promise((resolve, reject) => {
+
+      const newCounter: Counter = _.merge(this.counters[index], {
+        value: value,
+        lastUpdate: Date.now()
+      });
+
+      this.firebase.updateCounter(newCounter)
+      .then(() => {
+
+        this.counters[index] = _.cloneDeep(newCounter);
+        this.counters = _.orderBy(this.counters, ['lastUpdate'], ['desc']);
+
+        resolve(this.getCounterIndex(newCounter.id));
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
+  public resetCounter(id: string): Promise<number> {
+
+    let index = this.getCounterIndex(id);
+
+    if ( index < 0 || index > this.counters.length - 1 ) return Promise.reject(new Error('Index out of range!'));
+
+    return new Promise((resolve, reject) => {
+
+      const newCounter: Counter = _.merge(this.counters[index], {
+        lastReset: Date.now(),
+        lastUpdate: Date.now(),
+        value: 0
+      });
+
+      this.firebase.updateCounter(newCounter)
+      .then(() => {
+
+        // Recalculate the index since simultaneous auto resets can reorder the counters, making the index invalid
+        index = this.getCounterIndex(id);
+
+        this.counters[index] = _.cloneDeep(newCounter);
+        this.counters = _.orderBy(this.counters, ['lastUpdate'], ['desc']);
+
+        resolve(this.getCounterIndex(newCounter.id));
 
       })
       .catch(reject);
@@ -271,6 +359,18 @@ clearInterval(int)
     return {
       'auth/user-not-found': 'Account not found!'
     }[code] || 'An unknown error has occurred!';
+
+  }
+
+  public getCounterIndex(id: string): number {
+
+    return _.findIndex(this.counters, { id: id });
+
+  }
+
+  public getTodoIndex(id: string): number {
+
+    return _.findIndex(this.todos, { id: id });
 
   }
 

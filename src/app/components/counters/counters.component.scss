@@ -1,5 +1,45 @@
 @import '../../../common';
+@import '../../../colors';
 
 :host {
   @extend %host;
+}
+
+.over { color: map-get($colors, accent); }
+
+.counter-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  fa-icon {
+    transition: color .2s ease-in-out;
+  }
+  span.counter {
+    margin-top: 20px;
+    font-size: 50px;
+    transition: color .2s ease-in-out;
+    span.counter-limit {
+      color: map-get($colors, gray-medium);
+    }
+  }
+  span.info {
+    margin-top: 20px;
+    text-align: center;
+  }
+}
+
+.counter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  button.value-btn {
+    flex-grow: .5;
+    &:not(:first-child) { margin-left: 10px; }
+  }
+  button.wide {
+    width: 100%;
+    &:not(:first-child) { margin-top: 10px; }
+  }
 }
