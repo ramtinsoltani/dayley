@@ -1,0 +1,9 @@
+<form class="modal" #f="ngForm" (ngSubmit)="inputSubmit(f)">
+  <div class="input-container">
+    <input autofocus type="text" name="input" [ngModel]="defaultText" required>
+  </div>
+  <div class="button-container">
+    <button type="submit">OK</button>
+    <button type="button" class="primary" (click)="cancel()">CANCEL</button>
+  </div>
+</form>

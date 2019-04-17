@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FirebaseService } from './firebase.service';
 import { Counter } from '@app/model/counter';
-import { Todo } from '@app/model/todo';
+import { Todo, TodoItem } from '@app/model/todo';
 import { LimitReset } from '@app/model/common';
 import { Subject } from 'rxjs';
 import moment from 'moment';
@@ -20,6 +20,7 @@ export class AppService {
   private mustFetchStats: boolean = true;
 
   public onCounterReset: Subject<void> = new Subject<void>();
+  public onTodoReset: Subject<void> = new Subject<void>();
 
   constructor(
     private firebase: FirebaseService
@@ -46,7 +47,7 @@ export class AppService {
 
     });
 
-    // Check counters for reset
+    // Check counters and todos for reset
     setInterval(() => {
 
       for ( const counter of this.counters ) {
@@ -64,6 +65,29 @@ export class AppService {
           .then(() => {
 
             this.onCounterReset.next();
+
+          })
+          .catch(console.error);
+
+        }
+
+      }
+
+      for ( const todo of this.todos ) {
+
+        if ( todo.resets === LimitReset.Manual ) continue;
+
+        const lastReset = moment(todo.lastReset);
+        const now = moment();
+
+        if ( (todo.resets === LimitReset.Daily && now.diff(lastReset, 'days') > 0) ||
+        (todo.resets === LimitReset.Monthly && now.diff(lastReset, 'months') > 0) ||
+        (todo.resets === LimitReset.Weekly && now.diff(lastReset, 'weeks')) ) {
+
+          this.resetTodo(todo.id)
+          .then(() => {
+
+            this.onTodoReset.next();
 
           })
           .catch(console.error);
@@ -235,7 +259,13 @@ export class AppService {
 
   }
 
-  public updateTodo(index: number, name: string, ): Promise<number> {
+  public updateTodo(
+    index: number,
+    name: string,
+    resets: LimitReset,
+    items: TodoItem[],
+    icon: string
+  ): Promise<number> {
 
     if ( index < 0 || index > this.todos.length - 1 ) return Promise.reject(new Error('Index out of range!'));
 
@@ -243,7 +273,10 @@ export class AppService {
 
       const newTodo: Todo = _.merge(this.todos[index], {
         lastUpdate: Date.now(),
-        // TODO: overwrite todo object with new input
+        name: name,
+        resets: resets,
+        items: items,
+        icon: icon
       });
 
       this.firebase.updateTodo(newTodo)
@@ -253,6 +286,32 @@ export class AppService {
         this.todos = _.orderBy(this.todos, ['lastUpdated'], ['desc']);
 
         resolve(this.getTodoIndex(newTodo.id));
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
+  public updateTodoItems(index: number, items: TodoItem[]): Promise<number> {
+
+    if ( index < 0 || index > this.todos.length - 1 ) return Promise.reject(new Error('Index out of range!'));
+
+    return new Promise((resolve, reject) => {
+
+      const lastUpdate = Date.now();
+
+      this.firebase.setTodoItems(this.todos[index].id, items, lastUpdate)
+      .then(() => {
+
+        let id = this.todos[index].id;
+
+        this.todos[index].items = _.cloneDeep(items);
+        this.todos[index].lastUpdate = lastUpdate;
+        this.todos = _.orderBy(this.todos, ['lastUpdated'], ['desc']);
+
+        resolve(this.getTodoIndex(id));
 
       })
       .catch(reject);
@@ -339,7 +398,40 @@ export class AppService {
         this.counters[index] = _.cloneDeep(newCounter);
         this.counters = _.orderBy(this.counters, ['lastUpdate'], ['desc']);
 
-        resolve(this.getCounterIndex(newCounter.id));
+        resolve(index);
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
+  public resetTodo(id: string): Promise<number> {
+
+    let index = this.getTodoIndex(id);
+
+    if ( index < 0 || index > this.todos.length ) return Promise.reject(new Error('Index out of range!'));
+
+    return new Promise((resolve, reject) => {
+
+      const newTodo: Todo = _.merge(this.todos[index], {
+        items: _.map(this.todos[index].items, item => {
+          item.checked = false;
+          return item;
+        })
+      });
+
+      this.firebase.updateTodo(newTodo)
+      .then(() => {
+
+        // Recalculate the index since simultaneous auto resets can reorder the todos, making the index invalid
+        index = this.getTodoIndex(id);
+
+        this.todos[index] = _.cloneDeep(newTodo);
+        this.todos = _.orderBy(this.todos, ['lastUpdate'], ['desc']);
+
+        resolve(index);
 
       })
       .catch(reject);

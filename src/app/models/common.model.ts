@@ -3,6 +3,7 @@ export enum LimitReset {
   Daily = 'daily',
   Weekly = 'weekly',
   Monthly = 'monthly',
-  Manual = 'manual'
+  Manual = 'manual',
+  None = 'none'
 
 }

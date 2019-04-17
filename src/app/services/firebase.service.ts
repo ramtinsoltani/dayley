@@ -5,7 +5,7 @@ import 'firebase/auth';
 import 'firebase/database';
 import { Observable, Observer } from 'rxjs';
 import { Counter } from '@app/model/counter';
-import { Todo } from '@app/model/todo';
+import { Todo, TodoItem } from '@app/model/todo';
 import _ from 'lodash';
 
 @Injectable({
@@ -204,6 +204,25 @@ export class FirebaseService {
     if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
 
     return firebase.database().ref(`todos/${firebase.auth().currentUser.uid}/${id}`).set(null);
+
+  }
+
+  public setTodoItems(id: string, items: TodoItem[], lastUpdate: number): Promise<void> {
+
+    if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
+
+    return new Promise((resolve, reject) => {
+
+      firebase.database().ref(`todos/${firebase.auth().currentUser.uid}/${id}/lastUpdate`).set(lastUpdate)
+      .then(() => {
+
+        return firebase.database().ref(`todos/${firebase.auth().currentUser.uid}/${id}/items`).set(items);
+
+      })
+      .then(resolve)
+      .catch(reject);
+
+    });
 
   }
 

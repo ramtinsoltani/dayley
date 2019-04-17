@@ -3,7 +3,7 @@
 [show-back]="state !== countersState.ListView && state !== countersState.Loading"
 [show-add]="state === countersState.ListView"
 [show-edit]="state === countersState.DetailView"
-(onback)="showListView()"
+(onback)="state !== countersState.EditView ? showListView() : showDetailView(currentCounter)"
 (onadd)="showNewView()"
 (onedit)="showEditView()">
 </app-header>
@@ -48,6 +48,12 @@
     </div>
   </form>
 </div>
+<div *ngIf="state === countersState.DetailView && counters[currentCounter].resets === 'manual'" class="options">
+  <div class="option" (click)="resetLimitOnCurrentCounter()">
+    <fa-icon icon="undo" size="sm"></fa-icon>
+    <span class="label">RESET</span>
+  </div>
+</div>
 <div *ngIf="state === countersState.DetailView" class="content-container">
   <div class="counter-details">
     <fa-icon [icon]="counters[currentCounter].icon" size="5x" [ngClass]="{ over: counters[currentCounter].value > counters[currentCounter].limit && counters[currentCounter].limit }"></fa-icon>
@@ -60,21 +66,9 @@
   <div class="counter-buttons">
     <button (click)="incrementCurrentCounter()" type="button" class="value-btn primary"><fa-icon icon="plus" size="lg"></fa-icon></button>
     <button (click)="decrementCurrentCounter()" [disabled]="! counters[currentCounter].value" type="button" class="value-btn"><fa-icon icon="minus" size="lg"></fa-icon></button>
-    <button *ngIf="counters[currentCounter].resets === 'manual'" (click)="resetLimitOnCurrentCounter()" type="button" class="wide">RESET</button>
   </div>
 </div>
 <div *ngIf="state === countersState.Loading" class="h-100 spinner-container">
   <fa-icon icon="spinner" size="2x"></fa-icon>
 </div>
-<div *ngIf="iconSelection" class="modal-container">
-  <div class="modal">
-    <div class="search-bar">
-      <input type="text" placeholder="Search for icons..." (input)="filterIcons($event.target.value)">
-    </div>
-    <div class="icons-container">
-      <div *ngFor="let icon of icons; let index = index" class="icon-item" (click)="selectIcon(index)">
-        <fa-icon [icon]="icon" size="2x"></fa-icon>
-      </div>
-    </div>
-  </div>
-</div>
+<app-icons-modal *ngIf="iconSelection" (onselect)="selectIcon($event)"></app-icons-modal>

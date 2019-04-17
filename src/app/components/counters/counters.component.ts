@@ -5,7 +5,6 @@ import { Counter } from '@app/model/counter';
 import { LimitReset } from '@app/model/common';
 import { Subscription } from 'rxjs';
 import _ from 'lodash';
-import iconsList from '@app/config/icons';
 
 @Component({
   selector: 'app-counters',
@@ -23,7 +22,6 @@ export class CountersComponent implements OnInit, OnDestroy {
   public currentCounter: number = -1;
   public title: string = 'counters';
   public iconSelection: boolean = false;
-  public icons: string[] = iconsList;
 
   private sub: Subscription;
 
@@ -53,16 +51,11 @@ export class CountersComponent implements OnInit, OnDestroy {
       this.app.getCounters()
       .then(counters => {
 
-        let currentId = this.counters[this.currentCounter].id;
+        let currentId = this.currentCounter > -1 ? this.counters[this.currentCounter].id : undefined;
 
         this.counters = counters;
 
-        if ( this.currentCounter > -1 ) return this.app.getCounterIndex(currentId);
-
-      })
-      .then(index => {
-
-        if ( index !== undefined ) this.currentCounter = index;
+        if ( this.currentCounter > -1 ) this.currentCounter = this.app.getCounterIndex(currentId);
 
       })
       .catch(console.error);
@@ -178,7 +171,7 @@ export class CountersComponent implements OnInit, OnDestroy {
     .then(counters => {
 
       this.counters = counters;
-      this.currentCounter = null;
+      this.currentCounter = -1;
       this.showListView();
 
     })
@@ -192,22 +185,11 @@ export class CountersComponent implements OnInit, OnDestroy {
 
   }
 
-  public selectIcon(index: number): void {
+  public selectIcon(icon: string): void {
 
     this.iconSelection = false;
-    this.editForm.value.icon = this.icons[index];
-    this.editForm.setValue(_.merge(this.editForm.value, { icon: this.icons[index] }));
-    this.icons = iconsList;
-
-  }
-
-  public filterIcons(query: string): void {
-
-    this.icons = _.filter(iconsList, (name: string) => {
-
-      return (new RegExp(query.toLowerCase().trim(), 'ig')).test(name);
-
-    });
+    this.editForm.value.icon = icon;
+    this.editForm.setValue(_.merge(this.editForm.value, { icon: icon }));
 
   }
 

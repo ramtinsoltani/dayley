@@ -1,0 +1,10 @@
+<div class="modal">
+  <div class="search-bar">
+    <input type="text" placeholder="Search for icons..." (input)="filterIcons($event.target.value)">
+  </div>
+  <div class="icons-container">
+    <div *ngFor="let icon of icons; let index = index" class="icon-item" (click)="selectIcon(index)">
+      <fa-icon [icon]="icon" size="2x"></fa-icon>
+    </div>
+  </div>
+</div>

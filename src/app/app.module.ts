@@ -5,6 +5,8 @@ import { DeviceDetectorModule } from 'ngx-device-detector';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
+  faUndo,
+  faEllipsisV,
   faMinus,
   faTasks,
   faSpinner,
@@ -209,10 +211,14 @@ import {
   HomeComponent,
   CountersComponent,
   TodosComponent,
-  SettingsComponent
+  SettingsComponent,
+  IconsModalComponent,
+  InputModalComponent
 } from '@app/components';
 
 library.add(
+  faUndo,
+  faEllipsisV,
   faMinus,
   faTasks,
   faSpinner,
@@ -417,7 +423,9 @@ library.add(
     TodosComponent,
     SettingsComponent,
     ConfirmPasswordDirective,
-    EmailDirective
+    EmailDirective,
+    IconsModalComponent,
+    InputModalComponent
   ],
   imports: [
     BrowserModule,

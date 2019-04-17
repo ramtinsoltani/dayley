@@ -161,6 +161,7 @@ button {
   .list-item {
     display: flex;
     padding: 16px 30px;
+    align-items: center;
     border-top: 1px solid map-get($colors, gray-light);
     background-color: map-get($colors, gray-lightest);
     transition: background-color .2s ease-in-out;
@@ -171,9 +172,11 @@ button {
     }
     span.label {
       flex-grow: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      &:not(.no-ellipsis) {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
     span.meta {
       color: map-get($colors, gray-medium);
@@ -186,53 +189,26 @@ button {
   }
 }
 
-.modal-container {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  background-color: map-get($colors, shadow-dark);
+.expand-around {
+  padding: 17px;
+  margin: -17px;
+}
+
+.options {
   display: flex;
-  padding: 20px;
-  box-sizing: border-box;
-  .modal {
-    box-shadow: 0 0 10px map-get($colors, shadow);
-    border-radius: 3px;
-    background-color: map-get($colors, gray-lightest);
-    height: 100%;
-    width: 100%;
+  width: 100%;
+  background-color: map-get($colors, gray-lightest);
+  padding: 20px 0;
+  border-bottom: 1px solid map-get($colors, gray-light);
+  .option {
     display: flex;
-    flex-direction: column;
-    padding: 20px;
-    box-sizing: border-box;
-    .search-bar {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 10px;
-    }
-    .icons-container {
-      display: flex;
-      flex-grow: 1;
-      justify-content: flex-start;
-      align-content: flex-start;
-      overflow: auto;
-      flex-wrap: wrap;
-      .icon-item {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 25%;
-        max-width: 80px;
-        min-width: 60px;
-        height: 60px;
-        border-radius: 3px;
-        background-color: map-get($colors, gray-lightest);
-        color: map-get($colors, gray-darker);
-        transition: background-color .2s ease-in-out, color .2s ease-in-out;
-        &:active {
-          background-color: map-get($colors, gray-light);
-          color: map-get($colors, accent);
-        }
-      }
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    flex-grow: 1;
+    color: map-get($colors, accent);
+    .label:not(:first-child) {
+      margin-left: 10px;
     }
   }
 }

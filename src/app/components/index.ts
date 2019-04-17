@@ -5,3 +5,5 @@ export * from './settings/settings.component';
 export * from './counters/counters.component';
 export * from './todos/todos.component';
 export * from './home/home.component';
+export * from './icons-modal/icons-modal.component';
+export * from './input-modal/input-modal.component';

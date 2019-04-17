@@ -1,5 +1,74 @@
 @import '../../../common';
+@import '../../../colors';
 
 :host {
   @extend %host;
+}
+
+.all-checked { color: map-get($colors, accent); }
+
+.checkbox {
+  min-width: 14px;
+  min-height: 14px;
+  border-radius: 50%;
+  border: 1px solid map-get($colors, gray-medium);
+  margin-right: 10px;
+  &.checked::after {
+    content: '';
+    display: block;
+    width: 12px;
+    min-width: 12px;
+    min-height: 12px;
+    background-color: map-get($colors, accent);
+    border-radius: 50%;
+    margin-left: 1px;
+    margin-top: 1px;
+  }
+  &.checked+span.label {
+    color: map-get($colors, gray-medium);
+    text-decoration: line-through;
+  }
+}
+
+.expand-around {
+  margin-right: -20px !important;
+  margin-left: 0px !important;
+  color: map-get($colors, gray-medium);
+  transition: color .2s ease-in-out;
+  &:active {
+    color: map-get($colors, accent);
+  }
+  * {
+    pointer-events: none;
+    margin-right: 0px !important;
+  }
+}
+
+.content-container.detail-view {
+  overflow-x: hidden;
+  padding-top: 0px;
+  .list-item:first-child {
+    border-top: none;
+  }
+}
+
+.list-item {
+  position: relative;
+  left: 0px;
+  transition: left .2s ease-in-out;
+  &.revealed { left: -100px; }
+  .hidden-option {
+    width: 50px;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: map-get($colors, gray-medium);
+    border: 1px solid map-get($colors, gray-light);
+    &.primary { color: map-get($colors, accent); }
+    &.first { right: -50px; border-right: none; }
+    &.second { right: -100px; }
+    * { margin: 0px !important; }
+  }
 }

@@ -1,4 +1,84 @@
-<app-header title="Todos"></app-header>
-<div class="content-container">
-  <p>Todos works!</p>
+<app-header
+[title]="title"
+[show-back]="state !== todosState.ListView && state !== todosState.Loading"
+[show-add]="state === todosState.ListView"
+[show-edit]="state === todosState.DetailView"
+(onback)="state !== todosState.EditView ? showListView() : showDetailView(currentTodo)"
+(onadd)="showNewView()"
+(onedit)="showEditView()">
+</app-header>
+<div *ngIf="state === todosState.ListView" class="content-container ph-0">
+  <div class="list">
+    <div *ngFor="let todo of todos; let index = index" class="list-item" (click)="showDetailView(index)">
+      <fa-icon [icon]="todo.icon" size="lg" transform="shrink-3" [ngClass]="{ 'all-checked': areAllChecked(index) }"></fa-icon>
+      <span class="label">{{ todo.name }}</span>
+      <span *ngIf="todo.resets !== 'none'" class="meta">{{ todo.resets }}</span>
+    </div>
+  </div>
 </div>
+<div *ngIf="state === todosState.NewView || state === todosState.EditView" class="content-container">
+  <form #ef="ngForm" (ngSubmit)="updateTodo(ef)" class="between">
+    <div class="input-group">
+      <input name="name" type="text" placeholder="Name" required [ngModel]="state === todosState.EditView ? todos[currentTodo].name : ''">
+      <div class="inline-input-group">
+        <span class="label">Resets</span>
+        <select name="resets" class="fill" [ngModel]="state === todosState.EditView ? todos[currentTodo].resets : resetsDefault.value">
+          <option #resetsDefault value="none">None</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="manual">Manual</option>
+        </select>
+      </div>
+      <div class="inline-input-group">
+        <span class="label">Icon</span>
+        <input type="text" name="icon" [ngModel]="state === todosState.EditView ? todos[currentTodo].icon : 'tasks'" hidden>
+        <div class="fill icon-view">
+          <fa-icon [icon]="ef.value.icon || 'tasks'" size="lg"></fa-icon>
+        </div>
+        <button class="small" type="button" (click)="openIconSelector()">SELECT</button>
+      </div>
+    </div>
+    <div *ngIf="state === todosState.NewView" class="input-group">
+      <button [disabled]="ef.invalid" type="submit" class="primary">CREATE</button>
+    </div>
+    <div *ngIf="state === todosState.EditView" class="input-group">
+      <button [disabled]="ef.invalid" type="submit">SAVE</button>
+      <button type="button" class="primary" (click)="deleteTodo()">DELETE</button>
+    </div>
+  </form>
+</div>
+<ng-template [ngIf]="state === todosState.DetailView">
+  <div class="options">
+    <div class="option" (click)="showNewItemModal()">
+      <fa-icon icon="plus" size="sm"></fa-icon>
+      <span class="label">NEW ITEM</span>
+    </div>
+    <div *ngIf="todos[currentTodo].resets === 'manual'" class="option" (click)="resetTodo()">
+      <fa-icon icon="undo" size="sm"></fa-icon>
+      <span class="label">RESET</span>
+    </div>
+  </div>
+  <div class="content-container ph-0 detail-view">
+    <div class="list">
+      <div *ngFor="let item of todos[currentTodo].items; let index = index" class="list-item" [ngClass]="{ revealed: currentRevealed === index }" (click)="toggleTodoItem(index)">
+        <div class="checkbox" [ngClass]="{ checked: item.checked }"></div>
+        <span class="label no-ellipsis">{{ item.value }}</span>
+        <div class="expand-around" (click)="toggleTodoItemOptions($event, index)">
+          <fa-icon icon="ellipsis-v"></fa-icon>
+        </div>
+        <div class="hidden-option first" (click)="editTodoItem($event, index)">
+          <fa-icon icon="pen"></fa-icon>
+        </div>
+        <div class="hidden-option primary second" (click)="deleteTodoItem($event, index)">
+          <fa-icon icon="trash"></fa-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<div *ngIf="state === todosState.Loading" class="h-100 spinner-container">
+  <fa-icon icon="spinner" size="2x"></fa-icon>
+</div>
+<app-icons-modal *ngIf="iconSelection" (onselect)="selectIcon($event)"></app-icons-modal>
+<app-input-modal *ngIf="itemNameInput" [default-text]="currentItem > -1 ? todos[currentTodo].items[currentItem].value : ''" (onsubmit)="updateTodoItem($event)" (oncancel)="closeItemModal()"></app-input-modal>
