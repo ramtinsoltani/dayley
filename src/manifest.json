@@ -2,7 +2,7 @@
   "name": "Dayley",
   "short_name": "Dayley",
   "theme_color": "#F95156",
-  "background_color": "#ffffff",
+  "background_color": "#F95156",
   "display": "standalone",
   "scope": "/",
   "start_url": "/",
