@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { SwUpdate } from '@angular/service-worker';
 import { FirebaseService } from './firebase.service';
 import { Counter } from '@app/model/counter';
 import { Todo, TodoItem } from '@app/model/todo';
@@ -21,9 +22,11 @@ export class AppService {
 
   public onCounterReset: Subject<void> = new Subject<void>();
   public onTodoReset: Subject<void> = new Subject<void>();
+  public updateAvailable: Subject<void> = new Subject<void>();
 
   constructor(
-    private firebase: FirebaseService
+    private firebase: FirebaseService,
+    private swUpdate: SwUpdate
   ) {
 
     this.firebase.onAuthChange.subscribe(authenticated => {
@@ -44,6 +47,12 @@ export class AppService {
       this.mustFetchCounters = true;
       this.mustFetchTodos = true;
       this.mustFetchStats = true;
+
+    });
+
+    this.swUpdate.available.subscribe(() => {
+
+      this.updateAvailable.next();
 
     });
 

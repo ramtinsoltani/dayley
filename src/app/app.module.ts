@@ -1,10 +1,12 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ServiceWorkerModule } from '@angular/service-worker';
 import { DeviceDetectorModule } from 'ngx-device-detector';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
+  faSync,
   faInfo,
   faUndo,
   faEllipsisV,
@@ -209,17 +211,19 @@ import {
   AuthComponent,
   HeaderComponent,
   FooterComponent,
-  HomeComponent,
+  StatsComponent,
   CountersComponent,
   TodosComponent,
   SettingsComponent,
   IconsModalComponent,
-  InputModalComponent
+  InputModalComponent,
+  GoalsComponent
 } from '@app/components';
-import { ServiceWorkerModule } from '@angular/service-worker';
+
 import { environment } from '../environments/environment';
 
 library.add(
+  faSync,
   faInfo,
   faUndo,
   faEllipsisV,
@@ -422,14 +426,15 @@ library.add(
     FooterComponent,
     HeaderComponent,
     AuthComponent,
-    HomeComponent,
+    StatsComponent,
     CountersComponent,
     TodosComponent,
     SettingsComponent,
     ConfirmPasswordDirective,
     EmailDirective,
     IconsModalComponent,
-    InputModalComponent
+    InputModalComponent,
+    GoalsComponent
   ],
   imports: [
     BrowserModule,

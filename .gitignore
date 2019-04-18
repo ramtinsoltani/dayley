@@ -46,5 +46,4 @@ testem.log
 Thumbs.db
 /src/app/configs/firebase.cert.json
 .firebaserc
-firebase.json
 .firebase

@@ -21,4 +21,10 @@ export class SettingsComponent {
 
   }
 
+  public refresh(): void {
+
+    window.location.reload();
+
+  }
+
 }

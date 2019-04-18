@@ -1,0 +1,6 @@
+@import '../../../common';
+@import '../../../colors';
+
+:host {
+  @extend %host;
+}

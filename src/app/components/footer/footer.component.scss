@@ -19,4 +19,16 @@
   transition: color .2s ease-in-out;
   outline: none;
   &.active { color: map-get($colors, accent); }
+  &.badge::after {
+    content: '';
+    display: block;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    margin-top: 8px;
+    margin-left: 8px;
+    position: absolute;
+    box-shadow: 0 0 10px map-get($colors, shadow);
+    background-color: map-get($colors, accent);
+  }
 }

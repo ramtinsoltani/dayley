@@ -10,6 +10,7 @@
   box-sizing: border-box;
   flex-direction: column;
   justify-content: center;
+  z-index: 2;
   .modal {
     box-shadow: 0 0 10px map-get($colors, shadow);
     border-radius: 3px;
