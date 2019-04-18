@@ -6,6 +6,7 @@
 }
 
 .all-checked { color: map-get($colors, accent); }
+.crossed { text-decoration: line-through; }
 
 .checkbox {
   min-width: 14px;

@@ -366,7 +366,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
     if ( ! this.goals[index].items.length ) return '0%';
 
-    return `${Math.min((this.calculateTotal(index) * 100) / this.goals[index].target, 100)}%`;
+    return `${Math.max(Math.min((this.calculateTotal(index) * 100) / this.goals[index].target, 100), 0)}%`;
 
   }
 

@@ -11,7 +11,7 @@
   <div class="list">
     <div *ngFor="let todo of todos; let index = index" class="list-item" (click)="showDetailView(index)">
       <fa-icon [icon]="todo.icon" size="lg" transform="shrink-3" [ngClass]="{ 'all-checked': areAllChecked(index) }"></fa-icon>
-      <span class="label">{{ todo.name }}</span>
+      <span class="label" [ngClass]="{ 'crossed': areAllChecked(index) }">{{ todo.name }}</span>
       <span *ngIf="todo.resets !== 'none'" class="meta">{{ todo.resets }}</span>
     </div>
   </div>
