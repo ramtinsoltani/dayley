@@ -359,7 +359,7 @@ export class TodosComponent implements OnInit, OnDestroy {
 
   public areAllChecked(index: number): boolean {
 
-    return ! _.filter(this.todos[index].items, item => ! item.checked).length;
+    return this.todos[index].items.length && ! _.filter(this.todos[index].items, item => ! item.checked).length;
 
   }
 
