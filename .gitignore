@@ -45,3 +45,6 @@ testem.log
 .DS_Store
 Thumbs.db
 /src/app/configs/firebase.cert.json
+.firebaserc
+firebase.json
+.firebase

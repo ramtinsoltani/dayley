@@ -69,6 +69,7 @@ select {
   background-color: map-get($colors, gray-lightest);
   border: none;
   border-bottom: 2px solid map-get($colors, gray-medium);
+  border-radius: none;
   font-family: 'Roboto', sans-serif;
   padding: 0 10px;
   font-size: 16px;

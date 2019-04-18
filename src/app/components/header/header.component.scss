@@ -2,7 +2,7 @@
 
 :host {
   display: flex;
-  height: 64px;
+  // height: 64px;
   background-color: map-get($colors, accent);
   padding: 20px 30px;
   box-sizing: border-box;
@@ -10,12 +10,11 @@
   color: map-get($colors, gray-lightest);
   text-transform: uppercase;
   font-size: 20px;
-  z-index: 100;
 }
 
 .title {
   text-overflow: ellipsis;
-  overflow: hidden;
+  overflow-x: hidden;
   white-space: nowrap;
   flex-grow: 1;
 }
