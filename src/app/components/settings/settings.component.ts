@@ -23,7 +23,7 @@ export class SettingsComponent {
 
   public refresh(): void {
 
-    window.location.reload();
+    window.location.reload(true);
 
   }
 
