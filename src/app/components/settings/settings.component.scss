@@ -1,5 +1,10 @@
 @import '../../../common';
+@import '../../../colors';
 
 :host {
   @extend %host;
+}
+
+.option {
+  color: map-get($colors, gray-medium);
 }

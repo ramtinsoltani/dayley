@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FirebaseService } from '@app/services';
+import { version } from '../../../../package.json';
 
 @Component({
   selector: 'app-settings',
@@ -7,6 +8,8 @@ import { FirebaseService } from '@app/services';
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent {
+
+  public appVersion: string = version;
 
   constructor(
     private firebase: FirebaseService

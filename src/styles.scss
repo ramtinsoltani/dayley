@@ -6,6 +6,8 @@ html, body {
   background-color: map-get($colors, gray-lightest);
   color: map-get($colors, gray-darker);
   height: 100%;
+  width: 100%;
+  position: fixed;
   margin: 0;
   padding: 0;
   user-select: none;
@@ -160,6 +162,7 @@ button {
   display: flex;
   flex-direction: column;
   .list-item {
+    min-height: 20px;
     display: flex;
     padding: 16px 30px;
     align-items: center;

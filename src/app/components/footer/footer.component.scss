@@ -2,7 +2,7 @@
 
 :host {
   display: flex;
-  height: 60px;
+  min-height: 60px;
   background-color: map-get($colors, gray-lighter);
   border-top: 1px solid map-get($colors, gray-light);
   align-items: center;

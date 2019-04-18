@@ -5,6 +5,7 @@ import { DeviceDetectorModule } from 'ngx-device-detector';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
+  faInfo,
   faUndo,
   faEllipsisV,
   faMinus,
@@ -219,6 +220,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 
 library.add(
+  faInfo,
   faUndo,
   faEllipsisV,
   faMinus,
