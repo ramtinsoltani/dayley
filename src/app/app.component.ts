@@ -20,6 +20,9 @@ export class AppComponent {
     private detector: DeviceDetectorService
   ) {
 
+    // Enable :active on touch (due to CSS property -webkit-tap-highlight-color)
+    document.addEventListener("touchstart", function(){}, true);
+
     this.desktop = this.detector.isDesktop();
 
     if ( this.desktop ) return;
