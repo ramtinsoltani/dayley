@@ -10,4 +10,5 @@ admin.initializeApp({
 
 admin.database().ref(`latestVersion`).set(version)
 .then(() => console.log('Version broadcasted.'))
-.catch(console.error);
+.catch(console.error)
+.finally(() => process.exit());
