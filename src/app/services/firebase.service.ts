@@ -23,6 +23,15 @@ export class FirebaseService {
     });
 
   });
+  public onVersionBroadcasted: Observable<string> = Observable.create((observer: Observer<string>) => {
+
+    firebase.database().ref(`latestVersion`).on('value', snapshot => {
+
+      if ( snapshot.exists() ) observer.next(snapshot.val());
+
+    });
+
+  });
 
   constructor() {
 

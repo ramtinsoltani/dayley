@@ -19,9 +19,9 @@ export class FooterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.sub = this.app.updateAvailable.subscribe(() => {
+    this.sub = this.app.updateAvailable.subscribe(latestVersion => {
 
-      this.updateAvailable = true;
+      this.updateAvailable = latestVersion !== this.app.appVersion;
 
     });
 

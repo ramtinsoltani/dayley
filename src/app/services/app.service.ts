@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { SwUpdate } from '@angular/service-worker';
 import { FirebaseService } from './firebase.service';
 import { Counter } from '@app/model/counter';
 import { Todo, TodoItem } from '@app/model/todo';
 import { Goal, GoalItem } from '@app/model/goal';
 import { LimitReset } from '@app/model/common';
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
 import moment from 'moment';
 import _ from 'lodash';
+import { version } from '../../../package.json';
 
 @Injectable({
   providedIn: 'root'
@@ -26,11 +26,12 @@ export class AppService {
   public onCounterReset: Subject<void> = new Subject<void>();
   public onTodoReset: Subject<void> = new Subject<void>();
   public onGoalReset: Subject<void> = new Subject<void>();
-  public updateAvailable: Subject<void> = new Subject<void>();
+  public readonly appVersion: string = version;
+  public latestAppVersion: string = this.appVersion;
+  public updateAvailable: BehaviorSubject<string> = new BehaviorSubject<string>(this.latestAppVersion);
 
   constructor(
-    private firebase: FirebaseService,
-    private swUpdate: SwUpdate
+    private firebase: FirebaseService
   ) {
 
     this.firebase.onAuthChange.subscribe(authenticated => {
@@ -57,9 +58,15 @@ export class AppService {
 
     });
 
-    this.swUpdate.available.subscribe(() => {
+    // Listen for broadcasting app versions
+    this.firebase.onVersionBroadcasted.subscribe(latestVersion => {
 
-      this.updateAvailable.next();
+      if ( version !== latestVersion ) {
+
+        this.latestAppVersion = latestVersion;
+        this.updateAvailable.next(latestVersion);
+
+      }
 
     });
 

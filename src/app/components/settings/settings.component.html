@@ -7,9 +7,9 @@
 </div>
 <div class="content-container ph-0">
   <div class="list">
-    <div class="list-item" (click)="refresh()">
+    <div *ngIf="appVersion !== availableVersion" class="list-item" (click)="refresh()">
       <fa-icon icon="sync" size="lg" transform="shrink-3"></fa-icon>
-      <span class="label">Sync App Version</span>
+      <span class="label">Update To Version {{ availableVersion }}</span>
     </div>
     <div class="list-item" (click)="logout()">
       <fa-icon icon="user" size="lg" transform="shrink-3"></fa-icon>

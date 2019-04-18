@@ -47,3 +47,4 @@ Thumbs.db
 /src/app/configs/firebase.cert.json
 .firebaserc
 .firebase
+firebase-admin.cert.json
