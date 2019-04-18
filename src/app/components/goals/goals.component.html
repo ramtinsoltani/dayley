@@ -1,4 +1,100 @@
-<app-header title="goals"></app-header>
-<div class="content-container">
-  <p>Goals works!</p>
+<app-header
+[title]="title"
+[show-back]="state !== goalsState.ListView && state !== goalsState.Loading"
+[show-add]="state === goalsState.ListView"
+[show-edit]="state === goalsState.DetailView"
+(onback)="state !== goalsState.EditView ? showListView() : showDetailView(currentGoal)"
+(onadd)="showNewView()"
+(onedit)="showEditView()">
+</app-header>
+<div *ngIf="state === goalsState.ListView" class="content-container ph-0">
+  <div class="list">
+    <div *ngFor="let goal of goals; let index = index" class="list-item" (click)="showDetailView(index)">
+      <fa-icon [icon]="goal.icon" size="lg" transform="shrink-3" [ngClass]="{ 'reached': calculateTotal(index) >= goal.target }"></fa-icon>
+      <span class="label">{{ goal.name }}</span>
+      <span *ngIf="goal.resets !== 'none'" class="meta">{{ goal.resets }}</span>
+      <div class="progress" [ngStyle]="{ width: calculatePercentage(index) }"></div>
+    </div>
+  </div>
 </div>
+<div *ngIf="state === goalsState.NewView || state === goalsState.EditView" class="content-container">
+  <form #ef="ngForm" (ngSubmit)="updateGoal(ef)" class="between">
+    <div class="input-group">
+      <input name="name" type="text" placeholder="Name" required [ngModel]="state === goalsState.EditView ? goals[currentGoal].name : ''">
+      <input name="target" type="number" placeholder="Target" pattern="^\d+$" required [ngModel]="state === goalsState.EditView ? goals[currentGoal].target : ''">
+      <div class="inline-input-group">
+        <span class="label">Resets</span>
+        <select name="resets" class="fill" [ngModel]="state === goalsState.EditView ? goals[currentGoal].resets : resetsDefault.value">
+          <option #resetsDefault value="none">None</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="manual">Manual</option>
+        </select>
+      </div>
+      <div class="inline-input-group">
+        <span class="label">Icon</span>
+        <input type="text" name="icon" [ngModel]="state === goalsState.EditView ? goals[currentGoal].icon : 'dollar-sign'" hidden>
+        <div class="fill icon-view">
+          <fa-icon [icon]="ef.value.icon || 'dollar-sign'" size="lg"></fa-icon>
+        </div>
+        <button class="small" type="button" (click)="openIconSelector()">SELECT</button>
+      </div>
+    </div>
+    <div *ngIf="state === goalsState.NewView" class="input-group">
+      <button [disabled]="ef.invalid" type="submit" class="primary">CREATE</button>
+    </div>
+    <div *ngIf="state === goalsState.EditView" class="input-group">
+      <button [disabled]="ef.invalid" type="submit">SAVE</button>
+      <button type="button" class="primary" (click)="deleteGoal()">DELETE</button>
+    </div>
+  </form>
+</div>
+<ng-template [ngIf]="state === goalsState.DetailView">
+  <div class="options">
+    <div class="option" (click)="showNewItemModal()">
+      <fa-icon icon="plus" size="sm"></fa-icon>
+      <span class="label">NEW ITEM</span>
+    </div>
+    <div *ngIf="goals[currentGoal].resets === 'manual'" class="option" (click)="resetGoal()">
+      <fa-icon icon="undo" size="sm"></fa-icon>
+      <span class="label">RESET</span>
+    </div>
+  </div>
+  <div class="goal-details" [ngClass]="{ 'reached': calculateTotal(currentGoal) >= goals[currentGoal].target }">
+    <fa-icon icon="dollar-sign"></fa-icon>
+    {{ calculateTotal(currentGoal) }}<span class="target">/{{ goals[currentGoal].target }}</span>
+  </div>
+  <div class="content-container ph-0 detail-view">
+    <div class="list">
+      <div *ngFor="let item of goals[currentGoal].items; let index = index" class="list-item" [ngClass]="{ revealed: currentRevealed === index, red: item.value < 0, green: item.value > 0 }">
+        <fa-icon icon="dollar-sign"></fa-icon>
+        <span class="label no-ellipsis" [ngClass]="{ 'no-grow': !! item.memo }">{{ item.value > 0 ? '+' : '' }}{{ item.value }}</span>
+        <span *ngIf="item.memo" class="meta grow ellipsis">{{ item.memo }}</span>
+        <div class="expand-around" (click)="toggleGoalItemOptions($event, index)">
+          <fa-icon icon="ellipsis-v"></fa-icon>
+        </div>
+        <div class="hidden-option first" (click)="editGoalItem($event, index)">
+          <fa-icon icon="pen"></fa-icon>
+        </div>
+        <div class="hidden-option primary second" (click)="deleteGoalItem($event, index)">
+          <fa-icon icon="trash"></fa-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<div *ngIf="state === goalsState.Loading" class="h-100 spinner-container">
+  <fa-icon icon="spinner" size="2x"></fa-icon>
+</div>
+<app-icons-modal *ngIf="iconSelection" (onselect)="selectIcon($event)"></app-icons-modal>
+<app-input-modal
+*ngIf="itemInput"
+placeholder="Value (use negative numbers for deductions)"
+secondary-placeholder="Memo (optional)"
+secondary-input
+input-type="number"
+[secondary-default-text]="currentItem > -1 ? goals[currentGoal].items[currentItem].memo || '' : ''"
+[default-text]="currentItem > -1 ? goals[currentGoal].items[currentItem].value : ''"
+(onsubmit)="updateGoalItem($event)"
+(oncancel)="closeItemModal()"></app-input-modal>

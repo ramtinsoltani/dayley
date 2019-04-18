@@ -4,3 +4,61 @@
 :host {
   @extend %host;
 }
+
+.reached { color: map-get($colors, success); }
+
+.goal-details {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  font-size: 40px;
+  fa-icon { margin-right: 10px; }
+  span.target { color: map-get($colors, gray-medium); }
+  border-bottom: 1px solid map-get($colors, gray-light);
+}
+
+.expand-around {
+  margin-right: -20px !important;
+  margin-left: 0px !important;
+  color: map-get($colors, gray-medium);
+  transition: color .2s ease-in-out;
+  &:active {
+    color: map-get($colors, accent);
+  }
+  * {
+    pointer-events: none;
+    margin-right: 0px !important;
+  }
+}
+
+.content-container.detail-view {
+  overflow-x: hidden;
+  padding-top: 0px;
+  .list-item:first-child {
+    border-top: none;
+  }
+}
+
+.list-item {
+  position: relative;
+  left: 0px;
+  transition: left .2s ease-in-out;
+  &.red { color: map-get($colors, accent); }
+  &.green { color: map-get($colors, success); }
+  &.revealed { left: -100px; }
+  .hidden-option {
+    width: 50px;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: map-get($colors, gray-medium);
+    border: 1px solid map-get($colors, gray-light);
+    &.primary { color: map-get($colors, accent); }
+    &.first { right: -50px; border-right: none; }
+    &.second { right: -100px; }
+    * { margin: 0px !important; }
+  }
+}

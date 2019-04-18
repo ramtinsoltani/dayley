@@ -3,6 +3,7 @@ import { SwUpdate } from '@angular/service-worker';
 import { FirebaseService } from './firebase.service';
 import { Counter } from '@app/model/counter';
 import { Todo, TodoItem } from '@app/model/todo';
+import { Goal, GoalItem } from '@app/model/goal';
 import { LimitReset } from '@app/model/common';
 import { Subject } from 'rxjs';
 import moment from 'moment';
@@ -15,13 +16,16 @@ export class AppService {
 
   private todos: Todo[] = [];
   private counters: Counter[] = [];
+  private goals: Goal[] = [];
   private stats: any = {};
   private mustFetchCounters: boolean = true;
   private mustFetchTodos: boolean = true;
   private mustFetchStats: boolean = true;
+  private mustFetchGoals: boolean = true;
 
   public onCounterReset: Subject<void> = new Subject<void>();
   public onTodoReset: Subject<void> = new Subject<void>();
+  public onGoalReset: Subject<void> = new Subject<void>();
   public updateAvailable: Subject<void> = new Subject<void>();
 
   constructor(
@@ -35,10 +39,12 @@ export class AppService {
 
         this.todos = [];
         this.counters = [];
+        this.goals = [];
         this.stats = {};
         this.mustFetchCounters = false;
         this.mustFetchTodos = false;
         this.mustFetchStats = false;
+        this.mustFetchGoals = false;
 
         return;
 
@@ -47,6 +53,7 @@ export class AppService {
       this.mustFetchCounters = true;
       this.mustFetchTodos = true;
       this.mustFetchStats = true;
+      this.mustFetchGoals = true;
 
     });
 
@@ -105,6 +112,29 @@ export class AppService {
 
       }
 
+      for ( const goal of this.goals ) {
+
+        if ( goal.resets === LimitReset.Manual ) continue;
+
+        const lastReset = moment(goal.lastReset);
+        const now = moment();
+
+        if ( (goal.resets === LimitReset.Daily && now.diff(lastReset, 'days') > 0) ||
+        (goal.resets === LimitReset.Monthly && now.diff(lastReset, 'months') > 0) ||
+        (goal.resets === LimitReset.Weekly && now.diff(lastReset, 'weeks')) ) {
+
+          this.resetGoal(goal.id)
+          .then(() => {
+
+            this.onGoalReset.next();
+
+          })
+          .catch(console.error);
+
+        }
+
+      }
+
     }, 1000);
 
   }
@@ -147,6 +177,25 @@ export class AppService {
 
   }
 
+  public getGoals(): Promise<Goal[]> {
+
+    return new Promise((resolve, reject) => {
+
+      if ( ! this.mustFetchGoals ) return resolve(_.cloneDeep(this.goals));
+
+      this.fetchGoals()
+      .then(goals => {
+
+        this.mustFetchGoals = false;
+        resolve(goals);
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
   public getStats(): Promise<any> {
 
     return new Promise((resolve, reject) => {
@@ -169,7 +218,7 @@ export class AppService {
   public newTodo(
     name: string,
     resets: LimitReset,
-    icon: string,
+    icon: string
   ): Promise<number> {
 
     return new Promise((resolve, reject) => {
@@ -230,6 +279,39 @@ export class AppService {
 
   }
 
+  public newGoal(
+    name: string,
+    resets: LimitReset,
+    icon: string,
+    target: number
+  ): Promise<number> {
+
+    return new Promise((resolve, reject) => {
+
+      this.firebase.newGoal({
+        id: null,
+        name: name,
+        resets: resets,
+        icon: icon,
+        items: [],
+        lastReset: Date.now(),
+        lastUpdate: Date.now(),
+        target: target
+      })
+      .then(goal => {
+
+        this.goals.push(goal);
+        this.goals = _.orderBy(this.goals, ['lastUpdate'], ['desc']);
+
+        resolve(this.getGoalIndex(goal.id));
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
   public deleteTodo(index: number): Promise<void> {
 
     if ( index < 0 || index > this.todos.length - 1 ) return Promise.reject(new Error('Index out of range!'));
@@ -268,6 +350,25 @@ export class AppService {
 
   }
 
+  public deleteGoal(index: number): Promise<void> {
+
+    if ( index < 0 || index > this.goals.length - 1 ) return Promise.reject(new Error('Index out of range!'));
+
+    return new Promise((resolve, reject) => {
+
+      this.firebase.deleteGoal(this.goals[index].id)
+      .then(() => {
+
+        this.goals.splice(index, 1);
+        resolve();
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
   public updateTodo(
     index: number,
     name: string,
@@ -292,7 +393,7 @@ export class AppService {
       .then(() => {
 
         this.todos[index] = _.cloneDeep(newTodo);
-        this.todos = _.orderBy(this.todos, ['lastUpdated'], ['desc']);
+        this.todos = _.orderBy(this.todos, ['lastUpdate'], ['desc']);
 
         resolve(this.getTodoIndex(newTodo.id));
 
@@ -318,9 +419,72 @@ export class AppService {
 
         this.todos[index].items = _.cloneDeep(items);
         this.todos[index].lastUpdate = lastUpdate;
-        this.todos = _.orderBy(this.todos, ['lastUpdated'], ['desc']);
+        this.todos = _.orderBy(this.todos, ['lastUpdate'], ['desc']);
 
         resolve(this.getTodoIndex(id));
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
+  public updateGoal(
+    index: number,
+    name: string,
+    resets: LimitReset,
+    items: GoalItem[],
+    icon: string,
+    target: number
+  ): Promise<number> {
+
+    if ( index < 0 || index > this.goals.length - 1 ) return Promise.reject(new Error('Index out of range!'));
+
+    return new Promise((resolve, reject) => {
+
+      const newGoal: Goal = _.merge(this.goals[index], {
+        lastUpdate: Date.now(),
+        name: name,
+        resets: resets,
+        items: items,
+        icon: icon,
+        target: target
+      });
+
+      this.firebase.updateGoal(newGoal)
+      .then(() => {
+
+        this.goals[index] = _.cloneDeep(newGoal);
+        this.goals = _.orderBy(this.goals, ['lastUpdate'], ['desc']);
+
+        resolve(this.getGoalIndex(newGoal.id));
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
+  public updateGoalItems(index: number, items: GoalItem[]): Promise<number> {
+
+    if ( index < 0 || index > this.goals.length - 1 ) return Promise.reject(new Error('Index out of range!'));
+
+    return new Promise((resolve, reject) => {
+
+      const lastUpdate = Date.now();
+
+      this.firebase.setGoalItems(this.goals[index].id, items, lastUpdate)
+      .then(() => {
+
+        let id = this.goals[index].id;
+
+        this.goals[index].items = _.cloneDeep(items);
+        this.goals[index].lastUpdate = lastUpdate;
+        this.goals = _.orderBy(this.goals, ['lastUpdate'], ['desc']);
+
+        resolve(this.getGoalIndex(id));
 
       })
       .catch(reject);
@@ -449,6 +613,39 @@ export class AppService {
 
   }
 
+  public resetGoal(id: string): Promise<number> {
+
+    let index = this.getGoalIndex(id);
+
+    if ( index < 0 || index > this.goals.length ) return Promise.reject(new Error('Index out of range!'));
+
+    return new Promise((resolve, reject) => {
+
+      const newGoal: Goal = _.merge(this.goals[index], {
+        lastUpdate: Date.now(),
+        lastReset: Date.now()
+      });
+
+      newGoal.items = [];
+
+      this.firebase.setGoalItems(newGoal.id, newGoal.items, newGoal.lastUpdate)
+      .then(() => {
+
+        // Recalculate the index since simultaneous auto resets can reorder the goals, making the index invalid
+        index = this.getGoalIndex(id);
+
+        this.goals[index] = _.cloneDeep(newGoal);
+        this.goals = _.orderBy(this.goals, ['lastUpdate'], ['desc']);
+
+        resolve(index);
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
   public updateStats(stats: any): Promise<void> {
 
     return this.firebase.updateStats(stats);
@@ -472,6 +669,12 @@ export class AppService {
   public getTodoIndex(id: string): number {
 
     return _.findIndex(this.todos, { id: id });
+
+  }
+
+  public getGoalIndex(id: string): number {
+
+    return _.findIndex(this.goals, { id: id });
 
   }
 
@@ -501,6 +704,23 @@ export class AppService {
 
         this.counters = counters;
         resolve(_.cloneDeep(this.counters));
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
+  private fetchGoals(): Promise<Goal[]> {
+
+    return new Promise((resolve, reject) => {
+
+      this.firebase.getGoals()
+      .then(goals => {
+
+        this.goals = goals;
+        resolve(_.cloneDeep(this.goals));
 
       })
       .catch(reject);

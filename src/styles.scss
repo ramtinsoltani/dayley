@@ -192,6 +192,14 @@ button {
     &:active {
       background-color: map-get($colors, gray-light);
     }
+    .progress {
+      position: absolute;
+      height: 3px;
+      width: 0%;
+      left: 0;
+      bottom: 0;
+      background-color: map-get($colors, success);
+    }
   }
 }
 
@@ -218,6 +226,15 @@ button {
     }
   }
 }
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grow { flex-grow: 1 !important; }
+.no-grow { flex-grow: 0 !important; }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }

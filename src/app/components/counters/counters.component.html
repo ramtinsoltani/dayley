@@ -57,7 +57,8 @@
 <div *ngIf="state === countersState.DetailView" class="content-container">
   <div class="counter-details">
     <fa-icon [icon]="counters[currentCounter].icon" size="5x" [ngClass]="{ over: counters[currentCounter].value > counters[currentCounter].limit && counters[currentCounter].limit }"></fa-icon>
-    <span class="counter" [ngClass]="{ over: counters[currentCounter].value > counters[currentCounter].limit && counters[currentCounter].limit }">{{ counters[currentCounter].value }}
+    <span class="counter" [ngClass]="{ over: counters[currentCounter].value > counters[currentCounter].limit && counters[currentCounter].limit }">
+      {{ counters[currentCounter].value }}
       <span *ngIf="counters[currentCounter].limit" class="counter-limit">/{{ counters[currentCounter].limit }}</span>
     </span>
     <span *ngIf="counters[currentCounter].limit && counters[currentCounter].value <= counters[currentCounter].limit" class="info">You have {{ counters[currentCounter].limit - counters[currentCounter].value }}{{ counters[currentCounter].resets !== 'manual' ? ' ' + counters[currentCounter].resets : '' }} {{ counters[currentCounter].name }} left{{ getUntilText() }}</span>

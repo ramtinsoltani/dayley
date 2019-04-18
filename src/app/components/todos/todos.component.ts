@@ -286,7 +286,7 @@ export class TodosComponent implements OnInit, OnDestroy {
 
   }
 
-  public updateTodoItem(value: string): void {
+  public updateTodoItem(value: any): void {
 
     this.itemNameInput = false;
 
@@ -297,7 +297,7 @@ export class TodosComponent implements OnInit, OnDestroy {
       let newIndex: number;
       const items = this.todos[this.currentTodo].items;
 
-      items[this.currentItem].value = value;
+      items[this.currentItem].value = value.input;
 
       this.app.updateTodoItems(this.currentTodo, items)
       .then(index => {
@@ -328,7 +328,7 @@ export class TodosComponent implements OnInit, OnDestroy {
 
       todo.items.push({
         checked: false,
-        value: value
+        value: value.input
       });
 
       this.app.updateTodo(

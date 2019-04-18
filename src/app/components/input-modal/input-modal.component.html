@@ -1,6 +1,7 @@
 <form class="modal" #f="ngForm" (ngSubmit)="inputSubmit(f)">
   <div class="input-container">
-    <input autofocus type="text" name="input" [ngModel]="defaultText" required>
+    <input autofocus [type]="inputType" name="input" [placeholder]="placeholder" [ngModel]="defaultText" required>
+    <input *ngIf="secondaryInput" [type]="secondaryInputType" name="secondaryInput" [placeholder]="secondaryPlaceholder" [ngModel]="secondaryDefaultText">
   </div>
   <div class="button-container">
     <button type="submit">OK</button>

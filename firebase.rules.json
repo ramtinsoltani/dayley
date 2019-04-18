@@ -1,5 +1,11 @@
 {
   "rules": {
+    "goals": {
+      "$uid": {
+        ".read": "auth !== null && auth.uid === $uid",
+        ".write": "auth !== null && auth.uid === $uid"
+      }
+    },
     "counters": {
       "$uid": {
         ".read": "auth !== null && auth.uid === $uid",

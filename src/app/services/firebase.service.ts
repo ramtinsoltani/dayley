@@ -6,6 +6,7 @@ import 'firebase/database';
 import { Observable, Observer } from 'rxjs';
 import { Counter } from '@app/model/counter';
 import { Todo, TodoItem } from '@app/model/todo';
+import { Goal, GoalItem } from '@app/model/goal';
 import _ from 'lodash';
 
 @Injectable({
@@ -111,6 +112,32 @@ export class FirebaseService {
         }
 
         resolve(_.orderBy(todos, ['lastUpdate'], ['desc']));
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
+  public getGoals(): Promise<Goal[]> {
+
+    if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
+
+    return new Promise((resolve, reject) => {
+
+      firebase.database().ref(`goals/${firebase.auth().currentUser.uid}`).once('value')
+      .then(snapshot => {
+
+        const goals: Goal[] = [];
+
+        for ( const id in snapshot.val() ) {
+
+          goals.push(_.merge(snapshot.val()[id], { id: id, items: snapshot.val()[id].items || [] }));
+
+        }
+
+        resolve(_.orderBy(goals, ['lastUpdate'], ['desc']));
 
       })
       .catch(reject);
@@ -231,6 +258,60 @@ export class FirebaseService {
     if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
 
     return firebase.database().ref(`stats/${firebase.auth().currentUser.uid}`).update(stats);
+
+  }
+
+  public newGoal(goal: Goal): Promise<Goal> {
+
+    if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
+
+    return new Promise((resolve, reject) => {
+
+      firebase.database().ref(`goals/${firebase.auth().currentUser.uid}`).push(_.merge(goal, { id: null }))
+      .then(reference => {
+
+        goal.id = reference.key;
+        resolve(goal);
+
+      })
+      .catch(reject);
+
+    });
+
+  }
+
+  public updateGoal(goal: Goal): Promise<void> {
+
+    if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
+
+    return firebase.database().ref(`goals/${firebase.auth().currentUser.uid}/${goal.id}`).update(_.merge(_.cloneDeep(goal), { id: null }));
+
+  }
+
+  public deleteGoal(id: string): Promise<void> {
+
+    if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
+
+    return firebase.database().ref(`goals/${firebase.auth().currentUser.uid}/${id}`).set(null);
+
+  }
+
+  public setGoalItems(id: string, items: GoalItem[], lastUpdate: number): Promise<void> {
+
+    if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
+
+    return new Promise((resolve, reject) => {
+
+      firebase.database().ref(`goals/${firebase.auth().currentUser.uid}/${id}/lastUpdate`).set(lastUpdate)
+      .then(() => {
+
+        return firebase.database().ref(`goals/${firebase.auth().currentUser.uid}/${id}/items`).set(items);
+
+      })
+      .then(resolve)
+      .catch(reject);
+
+    });
 
   }
 
