@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirebaseService } from '@app/services';
 import { DeviceDetectorService } from 'ngx-device-detector';
-import { SwUpdate } from '@angular/service-worker';
 
 @Component({
   selector: 'app-root',
@@ -18,8 +17,7 @@ export class AppComponent {
   constructor(
     private firebase: FirebaseService,
     private router: Router,
-    private detector: DeviceDetectorService,
-    private sw: SwUpdate
+    private detector: DeviceDetectorService
   ) {
 
     // Enable :active on touch (due to CSS property -webkit-tap-highlight-color)
@@ -38,8 +36,6 @@ export class AppComponent {
       else this.router.navigate(['/']);
 
     });
-
-    if ( this.sw.isEnabled ) this.sw.checkForUpdate();
 
   }
 

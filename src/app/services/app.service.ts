@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { SwUpdate } from '@angular/service-worker';
 import { FirebaseService } from './firebase.service';
 import { Counter } from '@app/model/counter';
 import { Todo, TodoItem } from '@app/model/todo';
@@ -31,7 +32,8 @@ export class AppService {
   public updateAvailable: BehaviorSubject<string> = new BehaviorSubject<string>(this.latestAppVersion);
 
   constructor(
-    private firebase: FirebaseService
+    private firebase: FirebaseService,
+    private sw: SwUpdate
   ) {
 
     this.firebase.onAuthChange.subscribe(authenticated => {
@@ -62,6 +64,8 @@ export class AppService {
     this.firebase.onVersionBroadcasted.subscribe(latestVersion => {
 
       if ( version !== latestVersion ) {
+
+        if ( this.sw.isEnabled ) this.sw.checkForUpdate();
 
         this.latestAppVersion = latestVersion;
         this.updateAvailable.next(latestVersion);
