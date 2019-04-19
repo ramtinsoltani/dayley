@@ -39,7 +39,7 @@ export class AppComponent {
 
     });
 
-    this.sw.checkForUpdate();
+    if ( this.sw.isEnabled ) this.sw.checkForUpdate();
 
   }
 

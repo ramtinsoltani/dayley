@@ -54,6 +54,7 @@ form {
     }
     .icon-view {
       height: 35px;
+      min-height: 35px;
       display: flex;
       align-items: center;
     }
@@ -70,6 +71,7 @@ input[type="password"],
 select {
   -webkit-appearance: none;
   height: 35px;
+  min-height: 35px;
   background-color: map-get($colors, gray-lightest);
   border: none;
   border-bottom: 2px solid map-get($colors, gray-medium);
@@ -114,6 +116,7 @@ button {
   border: none;
   outline: none;
   height: 50px;
+  min-height: 50px;
   background-color: map-get($colors, gray-darker);
   color: map-get($colors, gray-lightest);
   border-radius: 3px;
@@ -122,6 +125,7 @@ button {
   transition: color .2s ease-in-out, background-color .2s ease-in-out;
   &.small {
     height: 35px;
+    min-height: 35px;
     font-size: 14px;
   }
   &:disabled {
@@ -178,6 +182,8 @@ button {
     }
     span.label {
       flex-grow: 1;
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
       &:not(.no-ellipsis) {
         overflow: hidden;
         text-overflow: ellipsis;
