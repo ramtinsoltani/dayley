@@ -1,27 +1,36 @@
 # Dayley
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.8.
+A daily task manager with various features. Dayley is a PWA made with Angular 7.
 
-## Development server
+# Installation
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+  - Clone this repo
+  - Run `npm install`
+  - Create a Firebase project
+  - Add your web credentials/certificate at `/src/app/configs/firebase.cert.json`
+  - Add your admin service account at `/firebase-admin.cert.json`
+  - Enable email authentication on the Firebase project
+  - Enable realtime database on the Firebase project
+  - Deploy `firebase.rules.json` to database rules
+  - If Firebase hosting is used, make sure to have the following headers settings in your `firebase.json` under `hosting`:
+    ```json
+    "headers": [
+      {
+        "source": "ngsw-worker.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
+    ]
+    ```
 
-## Code scaffolding
+# Deploying
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+If Firebase hosting is used, use `npm run deploy`, otherwise make sure to run `node broadcast-version.js` to broadcast the new version to the database after each deploy.
 
-## Build
+# Building
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Use `ng build --prod`.
