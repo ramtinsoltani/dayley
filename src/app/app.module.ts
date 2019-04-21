@@ -6,6 +6,14 @@ import { DeviceDetectorModule } from 'ngx-device-detector';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
+  faDesktop,
+  faLaptop,
+  faTv,
+  faDatabase,
+  faTabletAlt,
+  faSimCard,
+  faHdd,
+  faKeyboard,
   faSync,
   faInfo,
   faUndo,
@@ -222,6 +230,14 @@ import {
 import { environment } from '../environments/environment';
 
 library.add(
+  faDesktop,
+  faLaptop,
+  faTv,
+  faDatabase,
+  faTabletAlt,
+  faSimCard,
+  faHdd,
+  faKeyboard,
   faSync,
   faInfo,
   faUndo,
