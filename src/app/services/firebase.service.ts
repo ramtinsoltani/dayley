@@ -155,24 +155,6 @@ export class FirebaseService {
 
   }
 
-  public getStats(): Promise<any> {
-
-    if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
-
-    return new Promise((resolve, reject) => {
-
-      firebase.database().ref(`stats${firebase.auth().currentUser.uid}`).once('value')
-      .then(snapshot => {
-
-        resolve(snapshot.val());
-
-      })
-      .catch(reject);
-
-    });
-
-  }
-
   public updateCounter(counter: Counter): Promise<void> {
 
     if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
@@ -259,14 +241,6 @@ export class FirebaseService {
       .catch(reject);
 
     });
-
-  }
-
-  public updateStats(stats: any): Promise<void> {
-
-    if ( ! firebase.auth().currentUser ) return Promise.reject(new Error('User not logged in!'));
-
-    return firebase.database().ref(`stats/${firebase.auth().currentUser.uid}`).update(stats);
 
   }
 

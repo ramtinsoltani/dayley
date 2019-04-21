@@ -21,12 +21,6 @@
         ".read": "auth !== null && auth.uid === $uid",
         ".write": "auth !== null && auth.uid === $uid"
       }
-    },
-    "stats": {
-      "$uid": {
-        ".read": "auth !== null && auth.uid === $uid",
-        ".write": "auth !== null && auth.uid === $uid"
-      }
     }
   }
 }

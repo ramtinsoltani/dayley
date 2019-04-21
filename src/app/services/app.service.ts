@@ -18,10 +18,8 @@ export class AppService {
   private todos: Todo[] = [];
   private counters: Counter[] = [];
   private goals: Goal[] = [];
-  private stats: any = {};
   private mustFetchCounters: boolean = true;
   private mustFetchTodos: boolean = true;
-  private mustFetchStats: boolean = true;
   private mustFetchGoals: boolean = true;
 
   public onCounterReset: Subject<void> = new Subject<void>();
@@ -43,10 +41,8 @@ export class AppService {
         this.todos = [];
         this.counters = [];
         this.goals = [];
-        this.stats = {};
         this.mustFetchCounters = false;
         this.mustFetchTodos = false;
-        this.mustFetchStats = false;
         this.mustFetchGoals = false;
 
         return;
@@ -55,7 +51,6 @@ export class AppService {
 
       this.mustFetchCounters = true;
       this.mustFetchTodos = true;
-      this.mustFetchStats = true;
       this.mustFetchGoals = true;
 
     });
@@ -199,25 +194,6 @@ export class AppService {
 
         this.mustFetchGoals = false;
         resolve(goals);
-
-      })
-      .catch(reject);
-
-    });
-
-  }
-
-  public getStats(): Promise<any> {
-
-    return new Promise((resolve, reject) => {
-
-      if ( ! this.mustFetchStats ) return resolve(_.cloneDeep(this.stats));
-
-      this.fetchStats()
-      .then(stats => {
-
-        this.mustFetchStats = false;
-        resolve(stats);
 
       })
       .catch(reject);
@@ -657,12 +633,6 @@ export class AppService {
 
   }
 
-  public updateStats(stats: any): Promise<void> {
-
-    return this.firebase.updateStats(stats);
-
-  }
-
   public getErrorMessage(code: string): string {
 
     return {
@@ -732,23 +702,6 @@ export class AppService {
 
         this.goals = goals;
         resolve(_.cloneDeep(this.goals));
-
-      })
-      .catch(reject);
-
-    });
-
-  }
-
-  private fetchStats(): Promise<any> {
-
-    return new Promise((resolve, reject) => {
-
-      this.firebase.getStats()
-      .then(stats => {
-
-        this.stats = stats;
-        resolve(_.cloneDeep(this.stats));
 
       })
       .catch(reject);

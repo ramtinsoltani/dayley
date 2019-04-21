@@ -4,7 +4,6 @@ export * from './auth/auth.component';
 export * from './settings/settings.component';
 export * from './counters/counters.component';
 export * from './todos/todos.component';
-export * from './stats/stats.component';
 export * from './icons-modal/icons-modal.component';
 export * from './input-modal/input-modal.component';
 export * from './goals/goals.component';
